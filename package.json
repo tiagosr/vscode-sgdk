@@ -1,0 +1,103 @@
+{
+    "name": "vscode-sgdk",
+    "displayName": "VSCode SGDK Support",
+    "description": "Create and develop C/ASM projects for the SEGA Mega Drive/Genesis with VSCode",
+    "version": "0.1.0",
+    "publisher": "tiagosr",
+    "repository": {
+        "url": "https://github.com/tiagosr/vscode-sgdk"
+    },
+    "engines": {
+        "vscode": "^1.22.0"
+    },
+    "categories": [
+        "Other"
+    ],
+    "keywords": [
+        "sgdk",
+        "megadrive",
+        "genesis",
+        "sega"
+    ],
+    "activationEvents": [
+        "workspaceContains:.vscode/sgdk.json"
+    ],
+    "main": "./src/main",
+    "contributes": {
+        "commands":[
+            {
+                "command": "sgdk.build",
+                "title": "Build Project",
+                "category": "SGDK"
+            },
+            {
+                "command": "sgdk.runInEmu",
+                "title": "Run Project in Emulator",
+                "category": "SGDK"
+            }
+        ],
+        "keybindings":[
+            {
+                "command": "sgdk.build",
+                "key": "ctrl+shift+B",
+                "when": "!inDebugMode && config.sgdk.enabled"
+            }
+        ],
+        "configuration": {
+            "type": "object",
+            "title": "SGDK Configuration",
+            "properties": {
+                "sgdk.enabled": {
+                    "type": "boolean",
+                    "default": "false",
+                    "description": "Enable SGDK extension",
+                    "scope": "resource"
+                },
+                "sgdk.compilerBasePath": {
+                    "type": ["string", "null"],
+                    "default": null,
+                    "description": "Specifies the path containing the SGDK compiler suite (the folder that contains bin/, inc/ and lib/)",
+                    "scope": "resource"
+                },
+                "sgdk.commandGCC": {
+                    "type": "string",
+                    "default": "bin/gcc",
+                    "description": "Specifies the command (absolute or relative to the SGDK base path) to call for compiling C files"
+                },
+                "sgdk.commandGAS": {
+                    "type": "string",
+                    "default": "bin/as",
+                    "description": "Specifies the command (absolute or relative to SGDK base path) to call for compiling M68K assembly files"
+                },
+                "sgdk.emulatorToRun": {
+                    "type": "string",
+                    "enum": [
+                        "bizhawk",
+                        "gens",
+                        "genesis plus",
+                        "mess"
+                    ],
+                    "default": "bizhawk",
+                    "description": "Selects the emulator to run to debug the generated ROM",
+                    "scope": "resource"
+                },
+                "sgdk.emulatorPath": {
+                    "type": "string",
+                    "description": "Specifies the path containing the selected emulator",
+                    "scope": "resource"
+                }
+            }
+        }
+    },
+    "scripts": {
+        "postinstall": "node ./node_modules/vscode/bin/install"
+    },
+    "devDependencies": {
+        "@types/node": "^7.0.43",
+        "@types/mocha": "^2.2.42",
+        "vscode": "^1.1.18"
+    },
+    "dependencies": {
+        "node-fetch": "^2.1.2"
+    }
+}
