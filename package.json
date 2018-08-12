@@ -3,6 +3,7 @@
     "displayName": "VSCode SGDK Support",
     "description": "Create and develop C/ASM projects for the SEGA Mega Drive/Genesis with VSCode",
     "version": "0.1.0",
+    "license": "MIT",
     "publisher": "tiagosr",
     "repository": {
         "url": "https://github.com/tiagosr/vscode-sgdk"
@@ -24,7 +25,7 @@
     ],
     "main": "./src/main",
     "contributes": {
-        "commands":[
+        "commands": [
             {
                 "command": "sgdk.build",
                 "title": "Build Project",
@@ -36,7 +37,7 @@
                 "category": "SGDK"
             }
         ],
-        "keybindings":[
+        "keybindings": [
             {
                 "command": "sgdk.build",
                 "key": "ctrl+shift+B",
@@ -54,7 +55,10 @@
                     "scope": "resource"
                 },
                 "sgdk.compilerBasePath": {
-                    "type": ["string", "null"],
+                    "type": [
+                        "string",
+                        "null"
+                    ],
                     "default": null,
                     "description": "Specifies the path containing the SGDK compiler suite (the folder that contains bin/, inc/ and lib/)",
                     "scope": "resource"
