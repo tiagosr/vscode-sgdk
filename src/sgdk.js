@@ -194,6 +194,12 @@ class LDLauncher {
     }
 }
 
+class ProjectCompiler {
+    constructor(gcc_options, gas_options, ld_options, files, file_out) {
+        
+    }
+}
+
 exports.GCCLauncher = GCCLauncher;
 exports.GASLauncher = GASLauncher;
 exports.LDLauncher = LDLauncher;
