@@ -8,17 +8,18 @@ const format = require('string-format');
 format.extend(String.prototype, {});
 
 
-class GCCOptions {
+class CCOptions {
+
     constructor() {
         this.include_paths = ['inc']
         this.defines = []
         this.flags = ['-m68000', '-Wall', '-fno-builtin']
         this.base_sdk = ""
-        this.gcc_path = "bin/gcc"
+        this.cc_path = "bin/gcc"
     }
 
-    getGCCPath() {
-        return path.join(this.base_sdk, this.gcc_path)
+    getCCPath() {
+        return path.join(this.base_sdk, this.cc_path)
     }
     static mapDefine(define) { return '-D'+define }
     mapIncludePath(inc_path) { return '-I'+path.join(this.base_sdk, inc_path) }
@@ -33,15 +34,15 @@ class GCCOptions {
     }
 }
 
-class GASOptions {
+class ASOptions {
     constructor() {
         this.defines = []
         this.base_sdk = ""
-        this.gas_path = "bin/as"
+        this.as_path = "bin/as"
     }
 
-    getGASPath() {
-        return path.join(this.base_sdk, this.gas_path)
+    getASPath() {
+        return path.join(this.base_sdk, this.as_path)
     }
 }
 
@@ -63,7 +64,7 @@ class LDOptions {
     }
 }
 
-class GCCLauncher {
+class CCLauncher {
     constructor(options, filename_in, filename_out) {
         this.options = options
         this.filename_in = filename_in
@@ -73,7 +74,7 @@ class GCCLauncher {
     compile() {
         let compiling = child_process.exec(
             "{gcc} {flags} {defines} {includes} -c {filename_in} -o {filename_out}".format({
-                gcc: this.options.getGCCPath(),
+                gcc: this.options.getCCPath(),
                 flags: this.options.getFlags(),
                 defines: this.options.getDefines(),
                 includes: this.options.getIncludes(),
@@ -108,7 +109,7 @@ class GCCLauncher {
     }
 }
 
-class GASLauncher {
+class ASLauncher {
     constructor(options, filename_in, filename_out) {
         this.options = options
         this.filename_in = filename_in
@@ -118,7 +119,7 @@ class GASLauncher {
     compile() {
         let compiling = child_process.exec(
             "{gas} -o {filename_out} {filename_in}".format({
-                gas: this.options.getGASPath(),
+                gas: this.options.getASPath(),
                 filename_in: this.filename_in,
                 filename_out: this.filename_out
             })
@@ -200,6 +201,10 @@ class ProjectCompiler {
     }
 }
 
-exports.GCCLauncher = GCCLauncher;
-exports.GASLauncher = GASLauncher;
+exports.CCOptions = CCOptions;
+exports.ASOptions = ASOptions;
+exports.LDOptions = LDOptions;
+exports.CCLauncher = CCLauncher;
+exports.ASLauncher = ASLauncher;
 exports.LDLauncher = LDLauncher;
+exports.ProjectCompiler = ProjectCompiler;

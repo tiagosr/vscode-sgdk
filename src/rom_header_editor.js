@@ -17,9 +17,9 @@ if (!String.prototype.padEnd) {
     };
 }
 
-class FixedWidthString {
-    constructor(width, initial, pad) {
-        this.width = width
+class FixedLengthString {
+    constructor(length, initial, pad) {
+        this.length = length
         this.pad = pad || ' '
         this.str = initial || ""
     }
@@ -27,10 +27,10 @@ class FixedWidthString {
         return str.padEnd(length, padding || ' ').substr(0, length);
     }
     emit() {
-        return trimPadString(this.str, this.width, this.pad)
+        return trimPadString(this.str, this.length, this.pad)
     }
     charCodeAt(i) {
-        if (this.str.width <= i) {
+        if (this.str.length <= i) {
             return this.pad.charCodeAt(0);
         }
         return this.str.charCodeAt(i);
@@ -40,25 +40,25 @@ class FixedWidthString {
 class RomHeader {
     constructor() {
         let now = new Date();
-        this.console = new FixedWidthString(16, "SEGA MEGA DRIVE");
-        this.copyright = new FixedWidthString(16, "(C)SOMETEAM "+now.getFullYear());
-        this.title_local = new FixedWidthString(48, "SAMPLE GAME");
-        this.title_int = new FixedWidthString(48, "SAMPLE GAME");
-        this.serial = new FixedWidthString(14, "GM 00000000-00");
+        this.console = new FixedLengthString(16, "SEGA MEGA DRIVE");
+        this.copyright = new FixedLengthString(16, "(C)SOMETEAM "+now.getFullYear());
+        this.title_local = new FixedLengthString(48, "SAMPLE GAME");
+        this.title_int = new FixedLengthString(48, "SAMPLE GAME");
+        this.serial = new FixedLengthString(14, "GM 00000000-00");
         this.checksum = 0;
-        this.io_support = new FixedWidthString(16, "JD");
+        this.io_support = new FixedLengthString(16, "JD");
         this.rom_start = 0;
         this.rom_end = 0x100000;
         this.ram_start = 0xff0000;
         this.ram_end = 0xffffff;
         this.have_sram = false;
-        //this.sram_sig = new FixedWidthString(2, "RA");
+        //this.sram_sig = new FixedLengthString(2, "RA");
         this.sram_type = 0;
         this.sram_start = 0x200000;
         this.sram_end = 0x2001ff;
-        this.modem_support = new FixedWidthString(12, "");
-        this.notes = new FixedWidthString(40, "WRITE YOUR NOTES HERE");
-        this.region = new FixedWidthString(16, "JUE");
+        this.modem_support = new FixedLengthString(12, "");
+        this.notes = new FixedLengthString(40, "WRITE YOUR NOTES HERE");
+        this.region = new FixedLengthString(16, "JUE");
     }
     emitbuffer() {
         let buf = new ArrayBuffer(256);

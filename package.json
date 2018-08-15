@@ -54,7 +54,7 @@
           "description": "Enable SGDK extension",
           "scope": "resource"
         },
-        "sgdk.compilerBasePath": {
+        "sgdk.base_path": {
           "type": [
             "string",
             "null"
@@ -63,12 +63,17 @@
           "description": "Specifies the path containing the SGDK compiler suite (the folder that contains bin/, inc/ and lib/)",
           "scope": "resource"
         },
-        "sgdk.commandGCC": {
+        "sgdk.CC.command": {
           "type": "string",
           "default": "bin/gcc",
           "description": "Specifies the command (absolute or relative to the SGDK base path) to call for compiling C files"
         },
-        "sgdk.commandGAS": {
+        "sgdk.CC.defines": {
+          "type": "array",
+          "default": [],
+          "description": "Default preprocessor defines for using with the C compiler"
+        },
+        "sgdk.AS.command": {
           "type": "string",
           "default": "bin/as",
           "description": "Specifies the command (absolute or relative to SGDK base path) to call for compiling M68K assembly files"
@@ -97,11 +102,15 @@
     "postinstall": "node ./node_modules/vscode/bin/install"
   },
   "devDependencies": {
-    "@types/node": "^7.0.43",
+    "@types/lodash": "^4.14.116",
     "@types/mocha": "^2.2.42",
+    "@types/node": "^7.0.43",
+    "tslint": "^5.11.0",
+    "typescript": "^3.0.1",
     "vscode": "^1.1.18"
   },
   "dependencies": {
+    "lodash": "^4.17.10",
     "node-fetch": "^2.1.2",
     "string-format": "^2.0.0"
   }
