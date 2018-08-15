@@ -1,41 +1,94 @@
-const vscode = require('vscode');
-const child_process = require('child_process');
-const fs = require('fs');
-const path = require('path');
-const os = require('os');
-const format = require('string-format');
+import * as vscode from "vscode";
+import * as child_process from "child_process";
+import * as fs from "fs";
+import { DepGraph } from "dependency-graph";
+import * as path from "path";
+import * as os from "os";
+import * as format from "string-format";
 
 format.extend(String.prototype, {});
 
+/**
+ * @typedef {Object} DefineItem
+ * An object containing the symbol and optional value for a define
+ * @property {string} symbol Pre-processor symbol #define
+ * @property {string} [value] Optional value for the #define
+ */
 
+/**
+ * @typedef {Object} CCOptionsObj
+ * @property {string[]} [include_paths]
+ * List of paths to search for system include files
+ * @property {DefineItem[]} [defines]
+ * List of Preprocessor #defines to pass to the compiler
+ * @property {string[]} [flags]
+ * List of flags to pass on to the C Compiler
+ * @property {string} [base_sdk]
+ * Base SGDK path
+ * @property {string} [cc_path]
+ * C Compiler path
+ */
+
+ /**
+  * C Compiler options definition object
+  */
 class CCOptions {
-
-    constructor() {
-        this.include_paths = ['inc']
-        this.defines = []
-        this.flags = ['-m68000', '-Wall', '-fno-builtin']
-        this.base_sdk = ""
-        this.cc_path = "bin/gcc"
+    /**
+     * Defaults for the C Compiler options
+     * @returns {CCOptionsObj}
+     */
+    static defaults() {
+        return {
+            include_paths: ['inc'],
+            defines: [],
+            flags: ['-m68000', '-Wall', '-fno-builtin'],
+            cc_path: "bin/gcc"
+        }
     }
 
+    /**
+     * 
+     * @param {CCOptionsObj} options 
+     */
+    constructor(options) {
+        /** @type {CCOptionsObj} */
+        this.options = Object.assign({}, CCOptions.defaults(), options);
+    }
+
+    /** @returns {string} The joined path for the C Compiler */
     getCCPath() {
-        return path.join(this.base_sdk, this.cc_path)
+        return path.join(this.options.base_sdk, this.options.cc_path)
     }
-    static mapDefine(define) { return '-D'+define }
-    mapIncludePath(inc_path) { return '-I'+path.join(this.base_sdk, inc_path) }
+
+    /**
+     * @param {DefineItem} define Define symbol entry
+     * @returns {string} String with -D prepended to it (and value, if set)
+     */
+    static mapDefine(define) { return '-D'+define.key+(('value' in define)? "="+define.value : "") }
+
+    /**
+     * 
+     * @param {string} inc_path Single include path to join
+     * @returns {string}
+     */
+    mapIncludePath(inc_path) { return '-I\"'+path.join(this.options.base_sdk, inc_path)+"\"" }
+    /** @returns {string} */
     getIncludes() {
-        return this.include_paths.map(this.mapIncludePath).join(' ')
+        return this.options.include_paths.map(this.mapIncludePath).join(' ')
     }
+    /** @returns {string} */
     getDefines() {
-        return this.defines.map(mapDefine).join(' ')
+        return this.options.defines.map(mapDefine).join(' ')
     }
+    /** @returns {string} */
     getFlags() {
-        return this.flags.join(' ')
+        return this.options.flags.join(' ')
     }
 }
 
 class ASOptions {
     constructor() {
+        /** @member {DefineItem[]} ASOptions.defines */
         this.defines = []
         this.base_sdk = ""
         this.as_path = "bin/as"
@@ -65,12 +118,21 @@ class LDOptions {
 }
 
 class CCLauncher {
+    /**
+     * 
+     * @param {CCOptions} options Compiler options
+     * @param {string} filename_in Input file
+     * @param {string} filename_out Output compiled file
+     */
     constructor(options, filename_in, filename_out) {
         this.options = options
         this.filename_in = filename_in
         this.filename_out = filename_out
     }
 
+    /**
+     * @returns {ChildProcess}
+     */
     compile() {
         let compiling = child_process.exec(
             "{gcc} {flags} {defines} {includes} -c {filename_in} -o {filename_out}".format({
@@ -110,6 +172,12 @@ class CCLauncher {
 }
 
 class ASLauncher {
+    /**
+     * 
+     * @param {ASOptions} options 
+     * @param {string} filename_in 
+     * @param {string} filename_out 
+     */
     constructor(options, filename_in, filename_out) {
         this.options = options
         this.filename_in = filename_in
@@ -149,9 +217,22 @@ class ASLauncher {
     on_stdout(chunk) {
 
     }
+
+    listDependencies() {
+        let dependencies = {}
+        let content = fs.readFileSync(this.filename_in)
+        
+    }
 }
 
 class LDLauncher {
+    /**
+     * 
+     * @param {LDOptions} options 
+     * @param {string} start_file 
+     * @param {string[]} filenames_in 
+     * @param {string} filename_out 
+     */
     constructor(options, start_file, filenames_in, filename_out) {
         this.options = options
         this.start_file = start_file
@@ -197,7 +278,12 @@ class LDLauncher {
 
 class ProjectCompiler {
     constructor(gcc_options, gas_options, ld_options, files, file_out) {
-        
+        this.depgraph = new DepGraph();
+        this.depgraph.addNode('rom_output', file_out);
+    }
+
+    static mapFileToCompiler(file, overrides) {
+
     }
 }
 
