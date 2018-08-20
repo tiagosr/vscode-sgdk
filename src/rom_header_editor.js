@@ -1,4 +1,4 @@
-import * as vscode from "vscode";
+const vscode = require("vscode")
 
 if (!String.prototype.padEnd) {
     String.prototype.padEnd = function padEnd(targetLength, padString) {
@@ -62,6 +62,7 @@ class FixedLengthString {
  * @property {string} [console]
  * A string specifying the console that will run this progam (16 chars)
  * Normally either "SEGA MEGA DRIVE" or "SEGA GENESIS"
+ * the "SEGA " part is mandatory, the ROM won't boot in TMSS systems if it isn't there
  * @property {string} [copyright]
  * A copyright string for the program (16 chars)
  * @property {string} [title_local]
@@ -74,8 +75,23 @@ class FixedLengthString {
  * Checksum within the header - can be overridden by calculated checksum
  * @property {string} [io_support]
  * I/O support (16 chars)
- * J for Joypad support
- * D for ?
+ * - J for Joypad support
+ * - 6 for 6-button pad support (if using the extra buttons)
+ * - 0 for Master System controller support
+ * - A for analog controller support
+ * - 4 for Multitap support
+ * - G for Lightgun support
+ * - L for Activator support
+ * - M for mouse support
+ * - B for trackball support
+ * - T for tablet support
+ * - V for paddle support
+ * - K for keyboard or keypad support
+ * - R for RS-232 support
+ * - P for printer support
+ * - C for CD-ROM (SEGA CD/MEGA CD) support
+ * - F for Floppy drive support
+ * - D for ?
  * @property {number} [rom_start]
  * Start address for ROM - in almost every situation it should be 0x000000
  * @property {number} [rom_end]
@@ -118,12 +134,12 @@ class RomHeader {
     constructor(header) {
         let now = new Date();
         this.console = header.console || "SEGA MEGA DRIVE";
-        this.copyright = header.copyright || ("(C)SOMETEAM "+now.getFullYear());
+        this.copyright = header.copyright || ("(C)TEAM "+now.getFullYear());
         this.title_local = header.title_local || "SAMPLE GAME";
         this.title_int = header.title_int || "SAMPLE GAME";
         this.serial = header.serial || "GM 00000000-00";
         this.checksum = header.checksum || 0;
-        this.io_support = header.io_support || "JD";
+        this.io_support = header.io_support || "J";
         this.rom_start = header.rom_start || 0;
         this.rom_end = header.rom_end || 0x100000;
         this.ram_start = header.ram_start || 0xff0000;

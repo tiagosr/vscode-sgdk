@@ -1,10 +1,10 @@
-import * as vscode from "vscode";
-import * as child_process from "child_process";
-import * as fs from "fs";
-import { DepGraph } from "dependency-graph";
-import * as path from "path";
-import * as os from "os";
-import * as format from "string-format";
+const vscode = require("vscode")
+const child_process = require("child_process")
+const fs = require("fs")
+const DepGraph = require("dependency-graph").DepGraph
+const path = require("path")
+const os = require("os")
+const format = require("format")
 
 format.extend(String.prototype, {});
 

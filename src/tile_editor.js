@@ -1,2 +1,2 @@
-import * as vscode from "vscode";
+const vscode = require("vscode")
 
