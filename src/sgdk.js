@@ -29,9 +29,9 @@ format.extend(String.prototype, {});
  * C Compiler path
  */
 
- /**
-  * C Compiler options definition object
-  */
+/**
+ * C Compiler options definition object
+ */
 class CCOptions {
     /**
      * Defaults for the C Compiler options
@@ -64,25 +64,25 @@ class CCOptions {
      * @param {DefineItem} define Define symbol entry
      * @returns {string} String with -D prepended to it (and value, if set)
      */
-    static mapDefine(define) { return '-D'+define.key+(('value' in define)? "="+define.value : "") }
+    static mapDefine(define) { return "-D"+define.key+(("value" in define)? "="+define.value : "") }
 
     /**
      * 
      * @param {string} inc_path Single include path to join
      * @returns {string}
      */
-    mapIncludePath(inc_path) { return '-I\"'+path.join(this.options.base_sdk, inc_path)+"\"" }
+    mapIncludePath(inc_path) { return "-I\""+path.join(this.options.base_sdk, inc_path)+"\"" }
     /** @returns {string} */
     getIncludes() {
-        return this.options.include_paths.map(this.mapIncludePath).join(' ')
+        return this.options.include_paths.map(this.mapIncludePath).join(" ")
     }
     /** @returns {string} */
     getDefines() {
-        return this.options.defines.map(mapDefine).join(' ')
+        return this.options.defines.map(CCOptions.mapDefine).join(" ")
     }
     /** @returns {string} */
     getFlags() {
-        return this.options.flags.join(' ')
+        return this.options.flags.join(" ")
     }
 }
 
@@ -101,9 +101,9 @@ class ASOptions {
 
 class LDOptions {
     constructor() {
-        this.linker_file = 'md.ld'
-        this.flags = ['-nostdlib', '--oformat binary']
-        this.libraries = ['libmd.a']
+        this.linker_file = "md.ld"
+        this.flags = ["-nostdlib", "--oformat binary"]
+        this.libraries = ["libmd.a"]
         this.base_sdk = ""
         this.ld_path = "bin/ld"
     }

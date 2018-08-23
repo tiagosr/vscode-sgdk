@@ -1,9 +1,9 @@
-const vscode = require("vscode")
+import vscode from "vscode";
 
 if (!String.prototype.padEnd) {
     String.prototype.padEnd = function padEnd(targetLength, padString) {
         targetLength = targetLength >> 0; //floor if number or convert non-number to 0;
-        padString = String((typeof padString !== 'undefined' ? padString : ' '));
+        padString = String((typeof padString !== "undefined" ? padString : " "));
         if (this.length > targetLength) {
             return String(this);
         }
@@ -25,7 +25,7 @@ class FixedLengthString {
      */
     constructor(length, str, pad) {
         this.length = length
-        this.pad = pad || ' '
+        this.pad = pad || " "
         this.str = str || ""
     }
     /**
@@ -36,13 +36,13 @@ class FixedLengthString {
      * @returns {string} The padded/trimmed string
      */
     static trimPadString(str, length, padding) {
-        return str.padEnd(length, padding || ' ').substr(0, length);
+        return str.padEnd(length, padding || " ").substr(0, length);
     }
     /**
      * @returns {string} The final padded/trimmed string
      */
     emit() {
-        return trimPadString(this.str, this.length, this.pad)
+        return this.trimPadString(this.str, this.length, this.pad)
     }
     /**
      * Gets the character code within the string
@@ -196,26 +196,27 @@ class RomHeader {
         let _title_local = new FixedLengthString(48, this.title_local);
         let _title_int = new FixedLengthString(48, this.title_int);
         let _serial = new FixedLengthString(14, this.serial);
-        for (var i = 0; i < 16; i++) {
+        let i = 0
+        for (i = 0; i < 16; i++) {
             bv[i] = _console.charCodeAt(i);
         }
-        for (var i = 0; i < 16; i++) {
+        for (i = 0; i < 16; i++) {
             bv[16+i] = _copyright.charCodeAt(i);
         }
-        for (var i = 0; i < 48; i++) {
+        for (i = 0; i < 48; i++) {
             bv[32+i] = _title_local.charCodeAt(i);
         }
-        for (var i = 0; i < 48; i++) {
+        for (i = 0; i < 48; i++) {
             bv[80+i] = _title_int.charCodeAt(i);
         }
-        for (var i = 0; i < 14; i++) {
+        for (i = 0; i < 14; i++) {
             bv[128+i] = _serial.charCodeAt(i);
         }
         // checksum bytes (to be filled in later)
         bv[142] = (this.checksum>>8) & 0xff;
         bv[143] = this.checksum & 0xff;
         let _io_support = new FixedLengthString(16, this.io_support, "\0");
-        for (var i = 0; i < 16; i++) {
+        for (i = 0; i < 16; i++) {
             bv[144+i] = _io_support.charCodeAt(i);
         }
         // rom start (defaults to 0x000000)
@@ -240,13 +241,13 @@ class RomHeader {
         bv[175] = (this.ram_end) & 0xff;
         let _sram_type = 0;
         if (this.have_sram) {
-            bv[176] = 'RA'.charCodeAt(0);
-            bv[177] = 'RA'.charCodeAt(1);
+            bv[176] = "RA".charCodeAt(0);
+            bv[177] = "RA".charCodeAt(1);
             _sram_type = 0x64;
             if (this.sram_backup) _sram_type += 0x80;
         } else {
-            bv[176] = '  '.charCodeAt(0);
-            bv[177] = '  '.charCodeAt(1);
+            bv[176] = "  ".charCodeAt(0);
+            bv[177] = "  ".charCodeAt(1);
         }
         bv[178] = (_sram_type >> 8) & 0xff;
         bv[179] = (_sram_type) & 0xff;
@@ -263,13 +264,13 @@ class RomHeader {
         let _modem_support = new FixedLengthString(12, this.modem_support, "\0");
         let _notes = new FixedLengthString(40, this.notes);
         let _region = new FixedLengthString(16, this.region);
-        for (var i = 0; i < 12; i++) {
+        for (i = 0; i < 12; i++) {
             bv[188+i] = _modem_support.charCodeAt(i);
         }
-        for (var i = 0; i < 40; i++) {
+        for (i = 0; i < 40; i++) {
             bv[200+i] = _notes.charCodeAt(i);
         }
-        for (var i = 0; i < 16; i++) {
+        for (i = 0; i < 16; i++) {
             bv[240+i] = _region.charCodeAt(i);
         }
         return buf;
