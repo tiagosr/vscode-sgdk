@@ -27,6 +27,22 @@ format.extend(String.prototype, {});
  * Base SGDK path
  * @property {string} [cc_path]
  * C Compiler path
+ * @property {string} [output_file]
+ * Output file name (relative to the workspace root)
+ */
+
+/**
+ * @typedef {Object} ASOptionsObj
+ * @property {DefineItem[]} [defines]
+ * List of Preprocessor #defines to pass to the compiler
+ * @property {string[]} [flags]
+ * List of flags to pass on to the C Compiler
+ * @property {string} [base_sdk]
+ * Base SGDK path
+ * @property {string} [as_path]
+ * AS assembler path
+ * @property {string} [output_file]
+ * Output file name (relative to the workspace root)
  */
 
 /**
@@ -39,16 +55,16 @@ class CCOptions {
      */
     static defaults() {
         return {
-            include_paths: ['inc'],
+            include_paths: ["inc"],
             defines: [],
-            flags: ['-m68000', '-Wall', '-fno-builtin'],
+            flags: ["-m68000", "-Wall", "-fno-builtin"],
             cc_path: "bin/gcc"
         }
     }
 
     /**
      * 
-     * @param {CCOptionsObj} options 
+     * @param {?CCOptionsObj} options 
      */
     constructor(options) {
         /** @type {CCOptionsObj} */
@@ -87,11 +103,21 @@ class CCOptions {
 }
 
 class ASOptions {
-    constructor() {
-        /** @member {DefineItem[]} ASOptions.defines */
-        this.defines = []
-        this.base_sdk = ""
-        this.as_path = "bin/as"
+    /** @returns {ASOptionsObj} */
+    static defaults() {
+        return {
+            defines: [],
+            as_path: "bin/as"
+        }
+    }
+
+    /**
+     * 
+     * @param {?ASOptionsObj} options 
+     */
+    constructor(options) {
+        /** @type {ASOptionsObj} */
+        this.options = Object.assign({}, ASOptions.defaults(), options);
     }
 
     getASPath() {
@@ -113,7 +139,7 @@ class LDOptions {
     }
 
     getFlags() {
-        return this.flags.join(' ')
+        return this.flags.join(" ")
     }
 }
 
@@ -144,9 +170,9 @@ class CCLauncher {
                 filename_out: this.filename_out
             })
         )
-        compiling.on('exit', this.on_exit)
-        compiling.stderr.on('data', this.on_stderr)
-        compiling.stdout.on('data', this.on_stdout)
+        compiling.on("exit", this.on_exit)
+        compiling.stderr.on("data", this.on_stderr)
+        compiling.stdout.on("data", this.on_stdout)
         return compiling
     }
 
@@ -192,9 +218,9 @@ class ASLauncher {
                 filename_out: this.filename_out
             })
         )
-        compiling.on('exit', this.on_exit)
-        compiling.stdout.on('data', this.on_stdout)
-        compiling.stderr.on('data', this.on_stderr)
+        compiling.on("exit", this.on_exit)
+        compiling.stdout.on("data", this.on_stdout)
+        compiling.stderr.on("data", this.on_stderr)
         return compiling
     }
     
@@ -247,12 +273,12 @@ class LDLauncher {
                 linker_file: this.options.linker_file,
                 flags: this.options.getFlags(),
                 filename_out: this.filename_out,
-                filenames_in: this.filenames_in.join(' ')
+                filenames_in: this.filenames_in.join(" ")
             })
         )
-        linking.on('exit', this.on_exit)
-        linking.stdout.on('data', this.on_stdout)
-        linking.stderr.on('data', this.on_stderr)
+        linking.on("exit", this.on_exit)
+        linking.stdout.on("data", this.on_stdout)
+        linking.stderr.on("data", this.on_stderr)
         return linking
     }
     on_exit(code, signal) {
@@ -276,14 +302,38 @@ class LDLauncher {
     }
 }
 
+class FileConfig {
+    /**
+     * 
+     * @param {string} file_path 
+     */
+    constructor(file_path) {
+        this.file_path = file_path
+    }
+    get output_file_path() { return this.file_path }
+
+}
+
 class ProjectCompiler {
-    constructor(gcc_options, gas_options, ld_options, files, file_out) {
+    constructor(files, file_out) {
         this.depgraph = new DepGraph();
-        this.depgraph.addNode('rom_output', file_out);
+        this.depgraph.addNode("rom_output", file_out);
     }
 
     static mapFileToCompiler(file, overrides) {
 
+    }
+}
+
+class CFileConfig extends FileConfig {
+    /**
+     * 
+     * @param {string} file_path 
+     * @param {?CCOptionsObj} cc_options 
+     */
+    constructor(file_path, cc_options) {
+        super(file_path)
+        this.cc_options = cc_options
     }
 }
 
