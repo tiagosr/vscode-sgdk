@@ -57,7 +57,20 @@ class CCOptions {
         return {
             include_paths: ["inc"],
             defines: [],
-            flags: ["-m68000", "-Wall", "-fno-builtin"],
+            flags: ["-m68000", "-Wall", "-O1", "-fomit-frame-pointer", "-fno-builtin-memset", "-fno-builtin-memcpy"],
+            cc_path: "bin/gcc"
+        }
+    }
+
+    /**
+     * Defaults for the C Compiler options - Debug mode
+     * @returns {CCOptionsObj}
+     */
+    static defaultsDebug() {
+        return {
+            include_paths: ["inc"],
+            defines: ["_DEBUG"],
+            flags: ["-g3", "-m68000", "-Wall", "-fomit-frame-pointer", "-fno-builtin-memset", "-fno-builtin-memcpy", "-O1"],
             cc_path: "bin/gcc"
         }
     }
@@ -110,6 +123,13 @@ class ASOptions {
             as_path: "bin/as"
         }
     }
+    /** @returns {ASOptionsObj} */
+    static defaultsDebug() {
+        return {
+            defines: ["_DEBUG"],
+            as_path: "bin/as"
+        }
+    }
 
     /**
      * 
@@ -117,7 +137,7 @@ class ASOptions {
      */
     constructor(options) {
         /** @type {ASOptionsObj} */
-        this.options = Object.assign({}, ASOptions.defaults(), options);
+        this.options = Object.assign({}, ASOptions.defaults(), options)
     }
 
     getASPath() {
@@ -161,8 +181,8 @@ class CCLauncher {
      */
     compile() {
         let compiling = child_process.exec(
-            "{gcc} {flags} {defines} {includes} -c {filename_in} -o {filename_out}".format({
-                gcc: this.options.getCCPath(),
+            "{cc} {flags} {defines} {includes} -c {filename_in} -o {filename_out}".format({
+                cc: this.options.getCCPath(),
                 flags: this.options.getFlags(),
                 defines: this.options.getDefines(),
                 includes: this.options.getIncludes(),
@@ -310,24 +330,15 @@ class FileConfig {
     constructor(file_path) {
         this.file_path = file_path
     }
-    get output_file_path() { return this.file_path }
-
-}
-
-class ProjectCompiler {
-    constructor(files, file_out) {
-        this.depgraph = new DepGraph();
-        this.depgraph.addNode("rom_output", file_out);
-    }
-
-    static mapFileToCompiler(file, overrides) {
-
-    }
+    /** @type {string[]} */
+    get output_file_paths() { return [this.file_path] }
+    /** @type {string[]} */
+    get dependencies() { return [] }
 }
 
 class CFileConfig extends FileConfig {
     /**
-     * 
+     * File configuration for each compile unit
      * @param {string} file_path 
      * @param {?CCOptionsObj} cc_options 
      */
@@ -335,12 +346,88 @@ class CFileConfig extends FileConfig {
         super(file_path)
         this.cc_options = cc_options
     }
+    get output_file_paths() {
+        return [this.cc_options.output_file || CFileConfig.map_input_filename_to_output(this.file_path)]
+    }
+    static map_input_filename_to_output(filename) {
+        return filename.substr(0, filename.lastIndexOf("."))+".o"
+    }
 }
 
-exports.CCOptions = CCOptions;
-exports.ASOptions = ASOptions;
-exports.LDOptions = LDOptions;
-exports.CCLauncher = CCLauncher;
-exports.ASLauncher = ASLauncher;
-exports.LDLauncher = LDLauncher;
-exports.ProjectCompiler = ProjectCompiler;
+class SFileConfig extends FileConfig {
+    /**
+     * 
+     * @param {string} file_path 
+     * @param {?ASOptionsObj} as_options 
+     */
+    constructor(file_path, as_options) {
+        super(file_path)
+        this.as_options = as_options
+    }
+    get output_file_paths() {
+        return [this.cc_options.output_file || SFileConfig.map_input_filename_to_output(this.file_path)]
+    }
+    static map_input_filename_to_output(filename) {
+        return filename.substr(0, filename.lastIndexOf(".")) + ".o"
+    }
+}
+
+class RomHeaderFileConfig extends FileConfig {
+
+}
+
+class RomFileConfig extends FileConfig {
+    constructor(files_path, ld_options) {
+        super("sega.o")
+    }
+}
+
+class ProjectConfig {
+    static defaults() {
+        return {
+            Release: new ProjectConfig(CCOptions.defaults(), ASOptions.defaults()),
+            Debug: new ProjectConfig(CCOptions.defaultsDebug(), ASOptions.defaultsDebug())
+        }
+    }
+    /**
+     * 
+     * @param {CCOptionsObj} cc_options 
+     * @param {ASOptionsObj} as_options 
+     */
+    constructor(cc_options, as_options) {
+        this.cc_options = cc_options
+        this.as_options = as_options
+    }
+}
+
+class ProjectCompiler {
+    /**
+     * 
+     * @param {string[]} files 
+     * @param {string} file_out 
+     * @param {ProjectConfig} project_config 
+     */
+    constructor(files, file_out, project_config) {
+        this.depgraph = new DepGraph()
+        this.end_node = file_out
+        this.depgraph.addNode(file_out)
+        for (const file of files) {
+            this.depgraph.addNode(file)
+        }
+        this.project_config = project_config
+    }
+
+    static mapFileToCompiler(file, overrides) {
+
+    }
+}
+
+
+exports.CCOptions = CCOptions
+exports.ASOptions = ASOptions
+exports.LDOptions = LDOptions
+exports.CCLauncher = CCLauncher
+exports.ASLauncher = ASLauncher
+exports.LDLauncher = LDLauncher
+exports.ProjectConfig = ProjectConfig
+exports.ProjectCompiler = ProjectCompiler

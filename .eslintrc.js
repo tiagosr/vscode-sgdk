@@ -22,6 +22,10 @@ module.exports = {
     },
     "globals": {
         "ArrayBuffer": false,
-        "Uint8ClampedArray": false
+        "Uint8ClampedArray": false,
+        "Uint8Array": false,
+        "Uint16Array": false,
+        "Float32Array": false,
+        "Int16Array": false,
     }
 };

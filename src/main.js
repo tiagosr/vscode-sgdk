@@ -1,5 +1,6 @@
-import vscode from "vscode";
-import fs from "fs";
+const vscode = require("vscode")
+const fs = require("fs")
+const emu = require("./emu")
 
 var sgdkConfig = undefined;
 /** @type {string} */
@@ -27,8 +28,12 @@ function activate(context) {
         
         // https://github.com/politoleo/iar/blob/master/src/main.js
     });
+    let cmd_open_picodrive = vscode.commands.registerCommand("sgdk.picodrive", function () {
+        let pico = new emu.EmulatorView(context)
+        pico.createView()
+    });
 
-    context.subscriptions.push(cmd_build);
+    context.subscriptions.push(cmd_build, cmd_open_picodrive);
 }
 
 function deactivate() {
