@@ -17,11 +17,11 @@ class EmulatorView {
         this.panel = null
     }
 
-    get viewType() { return "sgdkPicoEmu" }
+    get viewType() { return "sgdk.emu.picodrive" }
     get viewTitle() { return "PicoDrive emulator" }
     get htmlFile() { return "PicoDrive.html" }
-    get htmlUrl() { return vscode.Uri.file(path.join(this.extensionPath, "resources", this.htmlFile)).with({ scheme: "vscode-resource" }) }
-    get baseUrl() { return vscode.Uri.file(path.join(this.extensionPath, "resources")+"/").with({scheme: "vscode-resource"}) }
+    get htmlUrl() { return vscode.Uri.file(path.join(this.extensionPath, "resources", this.htmlFile)) }
+    get baseUrl() { return vscode.Uri.file(path.join(this.extensionPath, "resources")+"/") }
     
     /**
      * 
@@ -30,17 +30,21 @@ class EmulatorView {
     createView() {
         try {
             const column = vscode.window.activeTextEditor ? vscode.window.activeTextEditor.viewColumn : vscode.ViewColumn.One
-            this.panel = vscode.window.createWebviewPanel(this.viewType, this.viewTitle, column, {
+            this.panel = vscode.window.createWebviewPanel(this.viewType, this.viewTitle, {
+                preserveFocus: true,
+                viewColumn: column
+            }, {
                 enableScripts: true,
-                enableFindWidget: false,
+                retainContextWhenHidden: true,
+                enableCommandUrls: true,
                 localResourceRoots: [
-                    path.join(this.extensionPath, "resources")
+                    this.baseUrl
                 ]
             })
             this.panel.onDidDispose(() => { this.dispose() }, null, this.disposables)
             this.panel.webview.html = this.makeHtml()
             this.panel.webview.onDidReceiveMessage(this.onWebviewMessage)
-            console.log("oe?")
+            console.log("PicoDrive Webview set up")
         } catch (err) {
             console.error(err)
         }
@@ -48,17 +52,17 @@ class EmulatorView {
     onWebviewMessage(message) {
         switch (message.command) {
         case "log":
-            vscode.window.showInformationMessage(message.text)
             console.log(message.text)
             return;
         case "error":
-            vscode.window.showErrorMessage(message.text)
             console.error(message.text)
             return;
         }
     }
     makeHtml() {
-        return fs.readFileSync(path.join(this.extensionPath, "resources", this.htmlFile)).toString().replace(/\{BASE_URL\}/g, this.baseUrl.toString())
+        const filename = path.join(this.extensionPath, "resources", this.htmlFile)
+        const base_url = this.baseUrl.with({ scheme: "vscode-resource" }).toString()
+        return fs.readFileSync(filename).toString().replace(/\{BASE_URL\}/g, base_url)
     }
     loadRom(filename) {
         this.panel.webview.postMessage({
