@@ -21,6 +21,7 @@
     "sega"
   ],
   "activationEvents": [
+    "onCommand:sgdk.picodrive",
     "workspaceContains:.vscode/sgdk.json"
   ],
   "main": "./src/main",
@@ -34,6 +35,11 @@
       {
         "command": "sgdk.runInEmu",
         "title": "Run Project in Emulator",
+        "category": "SGDK"
+      },
+      {
+        "command": "sgdk.picodrive",
+        "title": "Run in PicoDrive",
         "category": "SGDK"
       }
     ],
@@ -118,6 +124,7 @@
   },
   "dependencies": {
     "dependency-graph": "^0.7.1",
+    "express": "^4.16.3",
     "lodash": "^4.17.10",
     "mime": "^2.3.1",
     "node-fetch": "^2.1.2",

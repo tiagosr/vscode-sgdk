@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <title>Emscripten-Generated Code</title>
+    <base href="{BASE_URL}">
     <style>
       body {
         font-family: arial;
@@ -1220,6 +1220,7 @@
       var statusElement = document.getElementById('status');
       var progressElement = document.getElementById('progress');
       var spinnerElement = document.getElementById('spinner');
+      var vscode = acquireVsCodeApi();
 
       var Module = {
         preRun: [],
@@ -1234,6 +1235,10 @@
             //text = text.replace(/</g, "&lt;");
             //text = text.replace(/>/g, "&gt;");
             //text = text.replace('\n', '<br>', 'g');
+            vscode.postMessage({
+              command: "log",
+              text: text
+            })
             console.log(text);
             if (element) {
               element.value += text + "\n";
@@ -1246,6 +1251,10 @@
           if (0) { // XXX disabled for safety typeof dump == 'function') {
             dump(text + '\n'); // fast, straight to the real console
           } else {
+            vscode.postMessage({
+              command: "error",
+              text: text
+            })
             console.error(text);
           }
         },
@@ -1288,16 +1297,29 @@
         }
       };
       Module.setStatus('Downloading...');
-      window.onerror = function(event) {
+      Module.print("oi");
+      Module.print("{BASE_URL}");
+      window.onerror = function(msg, url, lineNo, columnNo, error) {
         // TODO: do not warn on ok events like simulating an infinite loop or exitStatus
         Module.setStatus('Exception thrown, see JavaScript console');
+        Module.printErr(msg)
         spinnerElement.style.display = 'none';
         Module.setStatus = function(text) {
           if (text) Module.printErr('[post-exception status] ' + text);
         };
       };
+      try {
+        var script_tag = document.createElement("script")
+        script_tag.setAttribute("type", "text/javascript")
+        script_tag.setAttribute("src", "{BASE_URL}PicoDrive.js")
+        script_tag.onerror = function (oerror) {
+          Module.printErr("Error loading " + oerror.target.src)
+        }
+        document.body.appendChild(script_tag)
+      } catch (err) {
+        Module.printErr(err)
+      }
     </script>
-    <script async type="text/javascript" src="PicoDrive.js"></script>
   </body>
 </html>
 

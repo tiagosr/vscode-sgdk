@@ -11,15 +11,16 @@ var folder = undefined;
  * @param {vscode.ExtensionContext} context 
  */
 function activate(context) {
-    if (!vscode.workspace.rootPath)
-        return;
-    folder = vscode.workspace.rootPath;
-    let config_file = folder + "/.vscode/sgdk.json";
+
     let spriteEditorUri = vscode.Uri.parse("sgdk://authority/sgdk-sprite");
     let tileEditorUri = vscode.Uri.parse("sgdk://authority/sgdk-tile");
     let musicTrackerUri = vscode.Uri.parse("sgdk://authority/sgdk-tracker");
 
     let cmd_build = vscode.commands.registerCommand("sgdk.build", function() {
+        if (!vscode.workspace.rootPath)
+            return;
+        folder = vscode.workspace.rootPath;
+        let config_file = folder + "/.vscode/sgdk.json";
         if (fs.existsSync(config_file)) {
             //
         } else {
@@ -33,7 +34,8 @@ function activate(context) {
         pico.createView()
     });
 
-    context.subscriptions.push(cmd_build, cmd_open_picodrive);
+    context.subscriptions.push(cmd_build)
+    context.subscriptions.push(cmd_open_picodrive)
 }
 
 function deactivate() {
