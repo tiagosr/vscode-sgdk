@@ -143,6 +143,17 @@
           Module.printErr("Error loading " + oerror.target.src)
         }
         document.body.appendChild(script_tag)
+        window.addEventListener("message", function(event) {
+          const message = event.data;
+          switch (message.command) {
+            case "loadRom":
+              Module.print("loading rom: "+message.filename)
+              break;
+          
+            default:
+              break;
+          }
+        })
       } catch (err) {
         Module.printErr(err)
       }

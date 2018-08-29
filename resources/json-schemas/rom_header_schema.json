@@ -1,0 +1,110 @@
+{
+    "$schema": "http://json-schema.org/schema#",
+    "$id": "https://raw.githubusercontent.com/tiagosr/vscode-sgdk/master/resources/json-schemas/rom_header.json",
+    "type": "object",
+    "title": "Rom Header root",
+    "description": "The root of the ROM Header file",
+    "additionalProperties": false,
+    "properties": {
+        "console": {
+            "type": "string",
+            "title": "Console specification",
+            "description": "A string specifying the console that will run this program.",
+            "$comment": "\"SEGA\" at the start is mandatory, standard values are \"SEGA MEGA DRIVE\" or \"SEGA GENESIS\"",
+            "maxLength": 16
+        },
+        "copyright": {
+            "type": "string",
+            "title": "Copyright string",
+            "description": "Copyright string for the program",
+            "maxLength": 16
+        },
+        "title_local": {
+            "type": "string",
+            "title": "Title (local version)",
+            "description": "Title for the local region",
+            "maxLength": 48
+        },
+        "title_overseas": {
+            "type": "string",
+            "title": "Title (overseas version)",
+            "description": "Title for the alternate regions from the initial release (normally the same as the first one)",
+            "maxLength": 48
+        },
+        "serial": {
+            "type": "string",
+            "title": "Serial number",
+            "description": "Normally in the format \"GM 00000000-00\" - where GM is the initials of the developer, and the zeroes are numbers under any system you like.",
+            "maxLength": 14
+        },
+        "checksum": {
+            "type": "integer",
+            "title": "Checksum",
+            "description": "Checksum of the ROM after 0x200 - disregarded by MD hardware, but can be generated"
+        },
+        "io_support": {
+            "type": "string",
+            "title": "IO Support",
+            "description": "I/O Support\n- J for Joypad support\n- 6 for 6-button pad support (if using the extra buttons)\n- 0 for Master System controller support\n- A for analog controller support\n- 4 for Multitap support\n- G for Lightgun support\n- L for Activator support\n- M for mouse support\n- B for trackball support\n- T for tablet support\n- V for paddle support\n- K for keyboard or keypad support\n- R for RS-232 support\n- P for printer support\n- C for CD-ROM (SEGA CD/MEGA CD) support\n- F for Floppy drive support\n- D for ?",
+            "maxLength": 16
+        },
+        "rom_start": {
+            "type": "integer",
+            "title": "ROM Start Address",
+            "description": "Start address for the program ROM - in almost every situation it should be 0x000000.\nIf not specified, default value of 0 will be used."
+        },
+        "rom_end": {
+            "type": "integer",
+            "title": "ROM End Address",
+            "description": "End address for the program ROM - in almost every situation it should be equal to the last addressable piece of the ROM before any mirror or internal address range.\nIf not specified, value will be calculated at the end of the build to the next available ROM size."
+        },
+        "ram_start": {
+            "type": "integer",
+            "title": "RAM Start Address",
+            "description": "Start address for the MD RAM - in almost every situation it should be 0xFF0000.\nIf not specified, default value of 0xff0000 will be used."
+        },
+        "ram_end": {
+            "type": "integer",
+            "title": "RAM End Address",
+            "description": "End address for the MD RAM - in almost every situation it should be equal to 0xffffff.\nIf not specified, default value of 0xffffff will be used."
+        },
+        "have_sram": {
+            "type": "boolean",
+            "title": "Have SRAM",
+            "description": "True if program expects to have access to in-cartridge SRAM"
+        },
+        "sram_backup": {
+            "type": "boolean",
+            "title": "SRAM is battery-backed (Backup)",
+            "description": "True if program expects SRAM to be battery-backed (for game saves, etc)"
+        },
+        "sram_start": {
+            "type": "integer",
+            "title": "SRAM Start Address",
+            "description": "Start address for the in-cartridge SRAM"
+        },
+        "sram_end": {
+            "type": "integer",
+            "title": "SRAM End Address",
+            "description": "End address for the in-cartridge SRAM"
+        },
+        "modem_support": {
+            "type": "string",
+            "title": "MODEM Support",
+            "description": "String specifying MODEM support",
+            "maxLength": 12
+        },
+        "notes": {
+            "type": "string",
+            "title": "Notes",
+            "description": "Anything goes",
+            "maxLength": 40
+        },
+        "region": {
+            "type": "string",
+            "title": "Region",
+            "description": "Region specification\n- J for Japan\n- U for United States\n- E for Europe",
+            "maxLength": 16
+        }
+    }
+}

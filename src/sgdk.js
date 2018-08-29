@@ -325,13 +325,13 @@ class LDLauncher {
 class FileConfig {
     /**
      * 
-     * @param {string} file_path 
+     * @param {string[]} file_paths 
      */
-    constructor(file_path) {
-        this.file_path = file_path
+    constructor(file_paths) {
+        this.file_paths = file_paths
     }
     /** @type {string[]} */
-    get output_file_paths() { return [this.file_path] }
+    get output_file_paths() { return this.file_paths }
     /** @type {string[]} */
     get dependencies() { return [] }
 }
@@ -343,7 +343,7 @@ class CFileConfig extends FileConfig {
      * @param {?CCOptionsObj} cc_options 
      */
     constructor(file_path, cc_options) {
-        super(file_path)
+        super([file_path])
         this.cc_options = cc_options
     }
     get output_file_paths() {
@@ -361,7 +361,7 @@ class SFileConfig extends FileConfig {
      * @param {?ASOptionsObj} as_options 
      */
     constructor(file_path, as_options) {
-        super(file_path)
+        super([file_path])
         this.as_options = as_options
     }
     get output_file_paths() {
@@ -373,12 +373,17 @@ class SFileConfig extends FileConfig {
 }
 
 class RomHeaderFileConfig extends FileConfig {
-
+    constructor() {
+        super(["rom_header.json"])
+    }
+    get output_file_paths() {
+        return ["out/rom_header.bin"]
+    }
 }
 
 class RomFileConfig extends FileConfig {
     constructor(files_path, ld_options) {
-        super("sega.o")
+        super(["sega.o"])
     }
 }
 

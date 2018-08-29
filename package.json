@@ -50,6 +50,12 @@
         "when": "!inDebugMode && config.sgdk.enabled"
       }
     ],
+    "jsonValidation": [
+      {
+        "fileMatch": "/rom_header.json",
+        "url": "./resources/json-schemas/rom_header_schema.json"
+      }
+    ],
     "configuration": {
       "type": "object",
       "title": "SGDK Configuration",
