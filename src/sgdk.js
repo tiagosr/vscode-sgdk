@@ -4,14 +4,14 @@ const fs = require("fs")
 const DepGraph = require("dependency-graph").DepGraph
 const path = require("path")
 const os = require("os")
-const format = require("format")
+const format = require("string-format")
 
 format.extend(String.prototype, {});
 
 /**
  * @typedef {Object} DefineItem
  * An object containing the symbol and optional value for a define
- * @property {string} symbol Pre-processor symbol #define
+ * @property {string} key Pre-processor symbol #define
  * @property {string} [value] Optional value for the #define
  */
 
@@ -46,6 +46,13 @@ format.extend(String.prototype, {});
  */
 
 /**
+ * @typedef {Object} LDOptionsObj
+ * @property {string} [linker_file]
+ * @property {string[]} [flags]
+ * @property {string[]} [libraries]
+ */
+
+/**
  * C Compiler options definition object
  */
 class CCOptions {
@@ -58,7 +65,6 @@ class CCOptions {
             include_paths: ["inc"],
             defines: [],
             flags: ["-m68000", "-Wall", "-O1", "-fomit-frame-pointer", "-fno-builtin-memset", "-fno-builtin-memcpy"],
-            cc_path: "bin/gcc"
         }
     }
 
@@ -69,9 +75,8 @@ class CCOptions {
     static defaultsDebug() {
         return {
             include_paths: ["inc"],
-            defines: ["_DEBUG"],
+            defines: [{key:"_DEBUG"}],
             flags: ["-g3", "-m68000", "-Wall", "-fomit-frame-pointer", "-fno-builtin-memset", "-fno-builtin-memcpy", "-O1"],
-            cc_path: "bin/gcc"
         }
     }
 
@@ -120,14 +125,12 @@ class ASOptions {
     static defaults() {
         return {
             defines: [],
-            as_path: "bin/as"
         }
     }
     /** @returns {ASOptionsObj} */
     static defaultsDebug() {
         return {
-            defines: ["_DEBUG"],
-            as_path: "bin/as"
+            defines: [{key: "_DEBUG"}],
         }
     }
 
@@ -141,21 +144,47 @@ class ASOptions {
     }
 
     getASPath() {
-        return path.join(this.base_sdk, this.as_path)
+        return path.join(
+            this.options.base_sdk || vscode.workspace.getConfiguration().get("sgdk.basePath"),
+            this.options.as_path || vscode.workspace.getConfiguration().get("sgdk.as.command")
+        )
     }
 }
 
 class LDOptions {
-    constructor() {
-        this.linker_file = "md.ld"
-        this.flags = ["-nostdlib", "--oformat binary"]
-        this.libraries = ["libmd.a"]
-        this.base_sdk = ""
-        this.ld_path = "bin/ld"
+    /** @return {LDOptionsObj} */
+    static defaults() {
+        return {
+            linker_file: "md.ld",
+            flags: ["-nostdlib", "--oformat binary"],
+            libraries: ["libmd.a"]
+        }
+    }
+
+    /** @return {LDOptionsObj} */
+    static defaultsDebug() {
+        return {
+            linker_file: "md.ld",
+            flags: ["-nostdlib", "--oformat binary"],
+            libraries: ["libmd.a"]
+        }
+    }
+
+
+
+    /**
+     * 
+     * @param {LDOptionsObj} options 
+     */
+    constructor(options) {
+        this.options = Object.assign({}, LDOptions.defaults(), options)
     }
 
     getLDPath() {
-        return path.join(this.base_sdk, this.ld_path)
+        return path.join(
+            this.options.base_sdk || vscode.workspace.getConfiguration().get("sgdk.basePath"),
+            this.options.ld_path || vscode.workspace.getConfiguration().get("sgdk.ld.command")
+        )
     }
 
     getFlags() {
@@ -387,21 +416,25 @@ class RomFileConfig extends FileConfig {
     }
 }
 
-class ProjectConfig {
+class BuildConfig {
     static defaults() {
-        return {
-            Release: new ProjectConfig(CCOptions.defaults(), ASOptions.defaults()),
-            Debug: new ProjectConfig(CCOptions.defaultsDebug(), ASOptions.defaultsDebug())
-        }
+        return [
+            new BuildConfig("Release", CCOptions.defaults(), ASOptions.defaults(), LDOptions.defaults()),
+            new BuildConfig("Debug", CCOptions.defaultsDebug(), ASOptions.defaultsDebug(), LDOptions.defaultsDebug())
+        ]
     }
     /**
      * 
+     * @param {string} name
      * @param {CCOptionsObj} cc_options 
      * @param {ASOptionsObj} as_options 
+     * @param {LDOptionsObj} ld_options
      */
-    constructor(cc_options, as_options) {
+    constructor(name, cc_options, as_options, ld_options) {
+        this.name = name
         this.cc_options = cc_options
         this.as_options = as_options
+        this.ld_options = ld_options
     }
 }
 
@@ -410,7 +443,7 @@ class ProjectCompiler {
      * 
      * @param {string[]} files 
      * @param {string} file_out 
-     * @param {ProjectConfig} project_config 
+     * @param {BuildConfig} project_config 
      */
     constructor(files, file_out, project_config) {
         this.depgraph = new DepGraph()
@@ -434,5 +467,5 @@ exports.LDOptions = LDOptions
 exports.CCLauncher = CCLauncher
 exports.ASLauncher = ASLauncher
 exports.LDLauncher = LDLauncher
-exports.ProjectConfig = ProjectConfig
+exports.BuildConfig = BuildConfig
 exports.ProjectCompiler = ProjectCompiler

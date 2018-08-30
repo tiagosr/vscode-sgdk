@@ -1,0 +1,123 @@
+{
+    "$schema": "http://json-schema.org/schema#",
+    "$id": "https://raw.githubusercontent.com/tiagosr/vscode-sgdk/master/resources/json-schemas/sgdk_options_schema.json",
+    "type": "object",
+    "title": "SGDK Options root",
+    "description": "The root of the SGDK Project Options File",
+    "properties": {
+        "buildConfigs": {
+            "type": "array",
+            "title": "Project build configurations",
+            "items": {
+                "type": "object",
+                "required": [
+                    "name",
+                    "cc_options",
+                    "as_options",
+                    "ld_options"
+                ],
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "title": "Build configuration name"
+                    },
+                    "cc_options" : {
+                        "type": "object",
+                        "title": "C Compiler options",
+                        "properties": {
+                            "flags": {
+                                "type": "array",
+                                "title": "C Compiler flags",
+                                "items": {
+                                    "type": "string",
+                                    "title": "Flag entry",
+                                    "examples": [
+                                        "-O2",
+                                        "-O3",
+                                        "-Os"
+                                    ]
+                                }
+                            },
+                            "include_paths": {
+                                "type": "array",
+                                "title": "C system include file paths",
+                                "items": {
+                                    "type": "string",
+                                    "title": "System include path"
+                                }
+                            },
+                            "defines": {
+                                "type": "array",
+                                "title": "C Compiler defines",
+                                "items": {
+                                    "type": "object",
+                                    "title": "Define entry",
+                                    "required": [
+                                        "key"
+                                    ],
+                                    "properties": {
+                                        "key": {
+                                            "type": "string",
+                                            "title": "Define symbol"
+                                        },
+                                        "value": {
+                                            "type": "string",
+                                            "title": "Substitution value"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "as_options": {
+                        "type": "object",
+                        "title": "Assembler options",
+                        "properties": {
+                            "defines": {
+                                "type": "array",
+                                "title": "Assembler defines",
+                                "items": {
+                                    "type": "object",
+                                    "title": "Define entry",
+                                    "required": [
+                                        "key"
+                                    ],
+                                    "properties": {
+                                        "key": {
+                                            "type": "string",
+                                            "title": "Define symbol"
+                                        },
+                                        "value": {
+                                            "type": "string",
+                                            "title": "Substitution value"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "ld_options": {
+                        "type": "object",
+                        "title": "Linker options",
+                        "properties": {
+                            "flags": {
+                                "type": "array",
+                                "title": "Linker flags",
+                                "items": {
+                                    "type": "string",
+                                    "title": "Flag",
+                                    "examples": [
+                                        "-i",
+                                        "--print-map",
+                                        "-O1",
+                                        "--strip-all"
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

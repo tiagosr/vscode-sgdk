@@ -1,37 +1,54 @@
 {
     "$schema": "http://json-schema.org/schema#",
-    "$id": "https://raw.githubusercontent.com/tiagosr/vscode-sgdk/master/resources/json-schemas/rom_header.json",
+    "$id": "https://raw.githubusercontent.com/tiagosr/vscode-sgdk/master/resources/json-schemas/rom_header_schema.json",
     "type": "object",
     "title": "Rom Header root",
     "description": "The root of the ROM Header file",
     "additionalProperties": false,
+    "required": [
+        "console",
+        "title_local",
+        "serial",
+        "region"
+    ],
     "properties": {
         "console": {
+            "$id": "#/properties/console",
             "type": "string",
             "title": "Console specification",
-            "description": "A string specifying the console that will run this program.",
-            "$comment": "\"SEGA\" at the start is mandatory, standard values are \"SEGA MEGA DRIVE\" or \"SEGA GENESIS\"",
+            "description": "A string specifying the console that will run this program.\n\"SEGA\" at the start is mandatory\nstandard values are \"SEGA MEGA DRIVE\" or \"SEGA GENESIS\"",
+            "default": "SEGA MEGA DRIVE",
+            "examples": [
+                "SEGA MEGA DRIVE",
+                "SEGA GENESIS",
+                "SEGA SST",
+                "SEGA 32X"
+            ],
             "maxLength": 16
         },
         "copyright": {
+            "$id": "#/properties/copyright",
             "type": "string",
             "title": "Copyright string",
             "description": "Copyright string for the program",
             "maxLength": 16
         },
         "title_local": {
+            "$id": "#/properties/title_local",
             "type": "string",
             "title": "Title (local version)",
             "description": "Title for the local region",
             "maxLength": 48
         },
-        "title_overseas": {
+        "title_int": {
+            "$id": "#/properties/title_local",
             "type": "string",
             "title": "Title (overseas version)",
             "description": "Title for the alternate regions from the initial release (normally the same as the first one)",
             "maxLength": 48
         },
         "serial": {
+            "$id": "#/properties/serial",
             "type": "string",
             "title": "Serial number",
             "description": "Normally in the format \"GM 00000000-00\" - where GM is the initials of the developer, and the zeroes are numbers under any system you like.",
@@ -51,7 +68,8 @@
         "rom_start": {
             "type": "integer",
             "title": "ROM Start Address",
-            "description": "Start address for the program ROM - in almost every situation it should be 0x000000.\nIf not specified, default value of 0 will be used."
+            "description": "Start address for the program ROM - in almost every situation it should be 0x000000.\nIf not specified, default value of 0 will be used.",
+            "default": 0
         },
         "rom_end": {
             "type": "integer",
@@ -104,7 +122,8 @@
             "type": "string",
             "title": "Region",
             "description": "Region specification\n- J for Japan\n- U for United States\n- E for Europe",
-            "maxLength": 16
+            "maxLength": 16,
+            "default": "JUE"
         }
     }
 }

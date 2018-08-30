@@ -21,12 +21,18 @@
     "sega"
   ],
   "activationEvents": [
+    "onCommand:sgdk.initProject",
     "onCommand:sgdk.picodrive",
     "workspaceContains:.vscode/sgdk.json"
   ],
   "main": "./src/main",
   "contributes": {
     "commands": [
+      {
+        "command": "sgdk.initProject",
+        "title": "Initialize Project",
+        "category": "SGDK"
+      },
       {
         "command": "sgdk.build",
         "title": "Build Project",
@@ -54,6 +60,10 @@
       {
         "fileMatch": "/rom_header.json",
         "url": "./resources/json-schemas/rom_header_schema.json"
+      },
+      {
+        "fileMatch": "/.vscode/sgdk.json",
+        "url": "./resources/json-schemas/sgdk_options_schema.json"
       }
     ],
     "configuration": {
@@ -66,7 +76,7 @@
           "description": "Enable SGDK extension",
           "scope": "resource"
         },
-        "sgdk.base_path": {
+        "sgdk.basePath": {
           "type": [
             "string",
             "null"
@@ -75,19 +85,19 @@
           "description": "Specifies the path containing the SGDK compiler suite (the folder that contains bin/, inc/ and lib/)",
           "scope": "resource"
         },
-        "sgdk.CC.command": {
+        "sgdk.cc.command": {
           "type": "string",
           "default": "bin/gcc",
           "description": "Specifies the command (absolute or relative to the SGDK base path) to call for compiling C files"
         },
-        "sgdk.CC.defines": {
-          "type": "array",
-          "default": [],
-          "description": "Default preprocessor defines for using with the C compiler"
-        },
-        "sgdk.AS.command": {
+        "sgdk.as.command": {
           "type": "string",
-          "default": "bin/as",
+          "default": "bin/gas",
+          "description": "Specifies the command (absolute or relative to SGDK base path) to call for compiling M68K assembly files"
+        },
+        "sgdk.ld.command": {
+          "type": "string",
+          "default": "bin/ld",
           "description": "Specifies the command (absolute or relative to SGDK base path) to call for compiling M68K assembly files"
         },
         "sgdk.emulatorToRun": {
