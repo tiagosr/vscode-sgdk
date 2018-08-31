@@ -1,17 +1,10 @@
 const vscode = require("vscode")
 const path = require("path")
+const emu = require("./emu")
 
-class TileEditor {
-    static get viewtype() { return "sgdk-tileeditor" }
-    constructor(extensionpath) {
-        this.panel = vscode.window.createWebviewPanel(TileEditor.viewtype, vscode.ViewColumn.One, {
-            enableScripts: true,
-            localResourceRoots: [
-                vscode.Uri.file(path.join(extensionpath, "resources"))
-            ]
-        })
-        
-    }
+class TileEditor extends emu.EmulatorView {
+    get viewType() { return "sgdk.tileeditor" }
+    get viewTitle() { return "Tile Editor" }
 }
 
 exports.TileEditor = TileEditor

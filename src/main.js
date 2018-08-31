@@ -43,11 +43,10 @@ function activate(context) {
             const choices = ["Overwrite .vscode/sgdk.json", "Don't overwrite"]
             vscode.window.showQuickPick(choices, {placeHolder: "Do you want to overwrite your workspace's .vscode/sgdk.json?"}).then(
                 (chosen)=>{
-                    if (choices.indexOf(chosen) != 0) {
-                        vscode.window.showInformationMessage("SGDK project init cancelled.")
-                        return
-                    } else {
+                    if (choices.indexOf(chosen) == 0) {
                         createProjectFile(config_folder, config_file)
+                    } else {
+                        vscode.window.showInformationMessage("SGDK project init cancelled.")
                     }
                 },
                 (reason)=> {

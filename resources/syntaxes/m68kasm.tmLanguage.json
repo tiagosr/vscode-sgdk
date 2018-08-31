@@ -1,0 +1,13 @@
+{
+    "fileTypes": [
+        "s",
+        "S"
+    ],
+    "name": "Motorola 68000 Assembly (GAS syntax)",
+    "scopeName": "assembly.gas.m68k",
+    "repository": {
+        "comment-line": {
+            "match": ""
+        }
+    }
+}
