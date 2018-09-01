@@ -66,6 +66,26 @@
         "url": "./resources/json-schemas/sgdk_options_schema.json"
       }
     ],
+    "languages": [
+      {
+        "id": "assembly.gas.m68k",
+        "aliases": [
+          "Motorola 68000 Assembly (GAS syntax)",
+          "M68K Assembly (GAS)"
+        ],
+        "extensions": [
+          "s"
+        ],
+        "configuration": "./resources/syntaxes/m68kasm.config.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "assembly.gas.m68k",
+        "scopeName": "source.assembly.gas.m68k",
+        "path": "./resources/syntaxes/m68kasm.tmLanguage.json"
+      }
+    ],
     "configuration": {
       "type": "object",
       "title": "SGDK Configuration",
