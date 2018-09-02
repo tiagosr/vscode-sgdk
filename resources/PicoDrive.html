@@ -2,35 +2,34 @@
 <html lang="en-us">
   <head>
     <meta charset="utf-8">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' vscode-resource: http: https:;">
+    <base href="{BASE_URL}">
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <style>
+      html {
+        height: 100%;
+      }
       body {
         font-family: arial;
         margin: 0;
         padding: none;
+        height: 100%;
       }
 
-      .emscripten { padding-right: 0; margin-left: auto; margin-right: auto; display: block; }
+      .emscripten { position: absolute; top:0; left:0; right:0; bottom:0; margin: auto; display: block; }
       div.emscripten { text-align: center; }      
       /* div.emscripten_border { border: 1px solid black; } */
       /* the canvas *must not* have any border or padding, or mouse coords will be wrong */
       canvas.emscripten { border: 0px none; background-color: black; }
 
-      #emscripten_logo {
-        display: inline-block;
-        margin: 0;
-      }
     </style>
   </head>
   <body>
-
-    
     <div class="emscripten_border">
       <canvas class="emscripten" id="canvas" oncontextmenu="event.preventDefault()"></canvas>
     </div>
     
     <script type='text/javascript'>
-      var statusElement = document.getElementById('status');
       var vscode = acquireVsCodeApi();
 
       var Module = {
@@ -45,6 +44,8 @@
           console.log(text);
         },
         printErr: function(text) {
+          if (!text) return;
+          text = text.toString()
           if (text.indexOf("requestAnimationFrame") >= 0 && text.indexOf("emscripten_set_main_loop") >= 0) return;
           vscode.postMessage({
             command: "error",
@@ -74,26 +75,61 @@
             text = m[1];
           } else {
           }
-          statusElement.innerHTML = text;
         },
         totalDependencies: 0,
-        monitorRunDependencies: function(left) { }
+        monitorRunDependencies: function(left) { },
+        loadRom: function (filename) {
+          let blob = null;
+          let xhr = new XMLHttpRequest()
+          xhr.open("GET", filename, true)
+          xhr.responseType = "blob"
+          xhr.onload = function (ev) {
+            blob = xhr.response;
+            let reader = new FileReader()
+            reader.addEventListener("loadend", function (ev) {
+              /** @type {ArrayBuffer} */
+              let buf = ev.srcElement.result
+              let next_cart_ptr = Module._malloc(buf.byteLength)
+              let dataHeap = new Uint8Array(Module.HEAP8.buffer, next_cart_ptr, buf.byteLength)
+              dataHeap.set(new Uint8Array(buf))
+              if (cart_insert(dataHeap.byteOffset, buf.byteLength, "") == 0) {
+                Module.print("ROM " + filename + " loaded")
+                Module._free(current_cart_ptr)
+                current_cart_ptr = next_cart_ptr
+              } else {
+                Module.printErr("Failed loading ROM " + filename)
+              }
+            })
+            reader.addEventListener("error", function (ev) {
+              Module.printErr("Failed loading ROM " + filename + ": Could not read as ArrayBuffer")
+            })
+            reader.readAsArrayBuffer(blob)
+          }
+          xhr.addEventListener("error", function (params) {
+            Module.printErr("Failed loading ROM " + filename + ": Error in XMLHttpRequest")
+          })
+          xhr.send()
+        },
+        onRuntimeInitialized: function() {
+          this.cartInsert = this.cwrap('cart_insert', 'number', ['number', 'number', 'string'])
+          this.cartInsertFromUrl = this.cwrap('cart_insert_from_url', 'void', ['string'])
+          this.sendInput = this.cwrap('send_input', 'void', ['number', 'number'])
+          this.print("Runtime initialized!")
+          setTimeout(function(){
+            Module.loadRom("roms/bf.bin")
+          }, 100)
+          this.run()
+        }
       };
-      let loadRom = function(filename) {
-        Module.printErr("Picodrive not loaded")
-      }
       window.onerror = function(msg, url, lineNo, columnNo, error) {
         Module.printErr(msg)
-        Module.setStatus = function(text) {
-          if (text) Module.printErr('[post-exception status] ' + text);
-        };
       };
       window.addEventListener("message", function (event) {
         const message = event.data;
         switch (message.command) {
           case "loadRom":
             Module.print("loading rom: " + message.filename)
-            loadRom(message.filename)
+            Module.cartInsertFromUrl(message.filename)
             break;
 
           default:
@@ -101,50 +137,21 @@
         }
       })
       try {
-        var script_tag = document.createElement("script")
-        script_tag.setAttribute("type", "text/javascript")
-        script_tag.setAttribute("src", "{BASE_URL}/PicoDrive.js")
-        script_tag.onerror = function (oerror) {
-          Module.printErr("Error loading " + oerror.target.src)
-        }
-        document.body.appendChild(script_tag)
-        let cart_insert = Module.cwrap('cart_insert', 'number', ['number', 'number', 'string'])
-        let current_cart_ptr = null;
-        loadRom = function(filename) {
-          let blob = null;
-          let xhr = new XMLHttpRequest()
-          xhr.open("GET", filename)
-          xhr.responseType = "blob"
-          xhr.onload = function (ev) {
-            blob = xhr.response;
-            let reader = new FileReader()
-            reader.addEventListener("loadend", function(ev) {
-              /** @type {ArrayBuffer} */
-              let buf = ev.srcElement.result
-              let next_cart_ptr = Module._malloc(buf.byteLength)
-              let dataHeap = new Uint8Array(Module.HEAP8.buffer, next_cart_ptr, buf.byteLength)
-              dataHeap.set(new Uint8Array(buf))
-              if (cart_insert(dataHeap.byteOffset, buf.byteLength, "") == 0) {
-                Module.print("ROM "+filename+" loaded")
-                Module._free(current_cart_ptr)
-                current_cart_ptr = next_cart_ptr
-              } else {
-                Module.printErr("Failed loading ROM "+filename)
-              }
-            })
-            reader.addEventListener("error", function(ev) {
-              Module.printErr("Failed loading ROM " + filename +": Could not read as ArrayBuffer")
-            })
-            reader.readAsArrayBuffer(blob)
-          }
-          xhr.addEventListener("error", function(params) {
-            Module.printErr("Failed loading ROM "+filename+": Error in XMLHttpRequest")
-          })
-          xhr.send()
-        }
+        var memoryInitializer = 'PicoDrive.html.mem';
+        memoryInitializer = Module['locateFile'] ? Module['locateFile'](memoryInitializer, '') : memoryInitializer;
+        Module['memoryInitializerRequestURL'] = memoryInitializer;
+        var meminitXHR = Module['memoryInitializerRequest'] = new XMLHttpRequest();
+        meminitXHR.open('GET', "{BASE_URL}/"+memoryInitializer, true);
+        meminitXHR.responseType = 'arraybuffer';
+        meminitXHR.send(null);
+
+        var script = document.createElement('script');
+        script.src = "{BASE_URL}/PicoDrive.js";
+        document.body.appendChild(script);
       } catch (err) {
         Module.printErr(err)
       }
+      window.Module = Module
     </script>
   </body>
 </html>
