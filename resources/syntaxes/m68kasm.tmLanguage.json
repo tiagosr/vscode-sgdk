@@ -58,6 +58,10 @@
             }
         },
         {
+            "name": "string.quoted",
+            "match": "(?:\".*?(?:[^\\\\](?:[\\\\][\\\\])*)\"|<.*?(?:[^\\\\](?:[\\\\][\\\\])*)>)"
+        },
+        {
             "name": "entity.name.tag.data",
             "match": "\\bdc\\.(b|w|l)\\b"
         },
@@ -70,24 +74,28 @@
             "match": "\\b(move|movem)(\\.(b|w|l))?\\b"
         },
         {
-            "name": "entity.name.function.instruction.set-clear",
-            "match": "\\b(set|clr)\\.(b|w|l)\\b"
-        },
-        {
             "name": "entity.name.function.instruction.move.other",
             "match": "\\b(moveq|movea|lea|swap)\\b"
         },
         {
             "name": "entity.name.function.instruction.test",
-            "match": "\\b(tst|cmp)\\.(b|w|l)\\b"
+            "match": "\\b(tst|cmp|tas|set|clr)\\.(b|w|l)\\b"
+        },
+        {
+            "name": "entity.name.function.instruction.test.cc",
+            "match": "\\bs(cc|cs|eq|f|ge|gt|hi|hs|le|ls|lt|mi|ne|pl|t|vc|vs)\\b"
+        },
+        {
+            "name": "entity.name.function.instruction.trap",
+            "match": "\\b(trapv|trap|chk)\\b"
         },
         {
             "name": "entity.name.function.instruction.arith",
             "match": "\\b(add|addu|addq|sub|subu|subq)\\.(b|w|l)\\b"
         },
         {
-            "name": "entity.name.function.instruction.arith-2",
-            "match": "\\b(mulu|mul|divu|div)\\b"
+            "name": "entity.name.function.instruction.arith.more",
+            "match": "\\b(abcd|sbcd|adda|suba|mulu|mul|divu|div)\\b"
         },
         {
             "name": "entity.name.function.instruction.logic",

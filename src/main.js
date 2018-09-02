@@ -29,6 +29,72 @@ function createProjectFile(config_folder, config_file) {
     }
 }
 
+function updateCProperties() {
+    let sgdkPath = vscode.workspace.getConfiguration().get("sgdk.basePath")
+    if (!sgdkPath) {
+        vscode.window.showErrorMessage("sgdk.basePath not set! not updating c_cpp_properties.json")
+        return
+    }
+    folder = vscode.workspace.rootPath
+    let properties_filename = path.join(folder, ".vscode", "c_cpp_properties.json")
+    if (fs.existsSync(properties_filename)) {
+        let properties = JSON.parse(fs.readSync(properties_filename).toString())
+        if ("env" in properties) {
+            properties["env"]["sgdkPath"] = vscode.workspace.getConfiguration().get("sgdk.basePath")
+        } else {
+            properties["env"] = {
+                sgdkPath: vscode.workspace.getConfiguration().get("sgdk.basePath")
+            }
+        }
+        let new_config = {
+            "name": "Mega Drive",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "${env:sgdkPath}/inc/*"
+            ],
+            "defines": [
+                "_DEBUG"
+            ],
+            "compilerPath": "${env:sgdkPath}/bin/gcc.exe",
+            "cStandard": "c11"
+        }
+        if (("configurations" in properties) && (properties["configurations"].length > 0)) {
+            let configs = properties["configurations"]
+            let found = configs.find(function(config) {
+                return config.includePath.indexOf("${env:sgdkPath}/inc/*") >= 0;
+            })
+            if (found < 0) {
+                properties["configurations"].push(new_config)
+            }
+        } else {
+            properties["configurations"] = [new_config]
+        }
+        fs.writeFileSync(properties_filename, JSON.stringify(properties, null, 4))
+    } else {
+        let properties = {
+            "env": {
+                "sgdkPath": sgdkPath
+            },
+            "configurations": [
+                {
+                    "name": "Mega Drive",
+                    "includePath": [
+                        "${workspaceFolder}/**",
+                        "${env:sgdkPath}/inc/*"
+                    ],
+                    "defines": [
+                        "_DEBUG"
+                    ],
+                    "compilerPath": "${env:sgdkPath}/bin/gcc.exe",
+                    "cStandard": "c11"
+                }
+            ],
+            "version": 4
+        }
+        fs.writeFileSync(properties_filename, JSON.stringify(properties, null, 4))
+    }
+}
+
 /**
  * 
  * @param {vscode.ExtensionContext} context 
@@ -75,8 +141,11 @@ function activate(context) {
         let pico = new emu.EmulatorView(context)
         pico.createView()
     })
+    let cmd_update_cproperties = vscode.commands.registerCommand("sgdk.updateCProperties", function() {
+        updateCProperties()
+    })
 
-    context.subscriptions.push(cmd_init_project, cmd_build, cmd_open_picodrive)
+    context.subscriptions.push(cmd_init_project, cmd_build, cmd_open_picodrive, cmd_update_cproperties)
 }
 
 function deactivate() {

@@ -47,6 +47,11 @@
         "command": "sgdk.picodrive",
         "title": "Run in PicoDrive",
         "category": "SGDK"
+      },
+      {
+        "command": "sgdk.updateCProperties",
+        "title": "Update C/C++ Properties (with SGDK settings/include paths)",
+        "category": "SGDK"
       }
     ],
     "keybindings": [
