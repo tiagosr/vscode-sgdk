@@ -2,8 +2,8 @@
 <html lang="en-us">
   <head>
     <meta charset="utf-8">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' vscode-resource: http: https:;">
-    <base href="{BASE_URL}">
+    <meta http-equiv="Content-Security-Policy" content="default-src * 'self' 'unsafe-inline' vscode-resource: http: https: data: blob:;">
+    <base href="{BASE_URL}/">
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <style>
       html {
@@ -78,6 +78,7 @@
         },
         totalDependencies: 0,
         monitorRunDependencies: function(left) { },
+        currentCartPtr: 0,
         loadRom: function (filename) {
           let blob = null;
           let xhr = new XMLHttpRequest()
@@ -92,10 +93,10 @@
               let next_cart_ptr = Module._malloc(buf.byteLength)
               let dataHeap = new Uint8Array(Module.HEAP8.buffer, next_cart_ptr, buf.byteLength)
               dataHeap.set(new Uint8Array(buf))
-              if (cart_insert(dataHeap.byteOffset, buf.byteLength, "") == 0) {
+              if (Module.cartInsert(dataHeap.byteOffset, buf.byteLength, null) == 0) {
                 Module.print("ROM " + filename + " loaded")
-                Module._free(current_cart_ptr)
-                current_cart_ptr = next_cart_ptr
+                Module._free(Module.currentCartPtr)
+                Module.currentCartPtr = next_cart_ptr
               } else {
                 Module.printErr("Failed loading ROM " + filename)
               }
@@ -115,11 +116,13 @@
           this.cartInsertFromUrl = this.cwrap('cart_insert_from_url', 'void', ['string'])
           this.sendInput = this.cwrap('send_input', 'void', ['number', 'number'])
           this.print("Runtime initialized!")
-          setTimeout(function(){
-            Module.loadRom("roms/bf.bin")
+          setTimeout(function() {
+            Module.loadRom("{BASE_URL}/roms/or.bin")
           }, 100)
           this.run()
         }
+        //,
+        //arguments: ["{BASE_URL}/roms/bf.bin"]
       };
       window.onerror = function(msg, url, lineNo, columnNo, error) {
         Module.printErr(msg)
@@ -137,11 +140,11 @@
         }
       })
       try {
-        var memoryInitializer = 'PicoDrive.html.mem';
+        var memoryInitializer = '{BASE_URL}/PicoDrive.html.mem';
         memoryInitializer = Module['locateFile'] ? Module['locateFile'](memoryInitializer, '') : memoryInitializer;
         Module['memoryInitializerRequestURL'] = memoryInitializer;
         var meminitXHR = Module['memoryInitializerRequest'] = new XMLHttpRequest();
-        meminitXHR.open('GET', "{BASE_URL}/"+memoryInitializer, true);
+        meminitXHR.open('GET', memoryInitializer, true);
         meminitXHR.responseType = 'arraybuffer';
         meminitXHR.send(null);
 

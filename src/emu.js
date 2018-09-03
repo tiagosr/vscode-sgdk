@@ -21,7 +21,7 @@ class EmulatorView {
     get viewTitle() { return "PicoDrive emulator" }
     get htmlFile() { return "PicoDrive.html" }
     get htmlUrl() { return vscode.Uri.file(path.join(this.extensionPath, "resources", this.htmlFile)) }
-    get baseUrl() { return vscode.Uri.file(path.join(this.extensionPath, "resources")+"/") }
+    get baseUrl() { return vscode.Uri.file(path.join(this.extensionPath, "resources")) }
     
     /**
      * 
