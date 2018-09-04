@@ -78,7 +78,6 @@
         },
         totalDependencies: 0,
         monitorRunDependencies: function(left) { },
-        currentCartPtr: 0,
         loadRom: function (filename) {
           let blob = null;
           let xhr = new XMLHttpRequest()
@@ -95,11 +94,10 @@
               dataHeap.set(new Uint8Array(buf))
               if (Module.cartInsert(dataHeap.byteOffset, buf.byteLength, null) == 0) {
                 Module.print("ROM " + filename + " loaded")
-                Module._free(Module.currentCartPtr)
-                Module.currentCartPtr = next_cart_ptr
               } else {
                 Module.printErr("Failed loading ROM " + filename)
               }
+              Module._free(next_cart_ptr)
             })
             reader.addEventListener("error", function (ev) {
               Module.printErr("Failed loading ROM " + filename + ": Could not read as ArrayBuffer")
@@ -117,7 +115,7 @@
           this.sendInput = this.cwrap('send_input', 'void', ['number', 'number'])
           this.print("Runtime initialized!")
           setTimeout(function() {
-            Module.loadRom("{BASE_URL}/roms/or.bin")
+            Module.loadRom("{BASE_URL}/roms/sth.bin")
           }, 100)
           this.run()
         }
