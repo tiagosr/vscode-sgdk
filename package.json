@@ -49,6 +49,11 @@
         "category": "SGDK"
       },
       {
+        "command": "sgdk.genplus",
+        "title": "Run in Genesis Plus GX",
+        "category": "SGDK"
+      },
+      {
         "command": "sgdk.updateCProperties",
         "title": "Update C/C++ Properties (with SGDK settings/include paths)",
         "category": "SGDK"
@@ -165,11 +170,11 @@
   },
   "dependencies": {
     "dependency-graph": "^0.7.1",
-    "express": "^4.16.3",
-    "lodash": "^4.17.10",
-    "mime": "^2.3.1",
-    "node-fetch": "^2.1.2",
+    "express": "^4.16.4",
+    "lodash": ">=4.17.11",
+    "mime": "^2.4.0",
+    "node-fetch": "^2.3.0",
     "string-format": "^2.0.0",
-    "vscode": "^1.1.21"
+    "vscode": "^1.1.30"
   }
 }

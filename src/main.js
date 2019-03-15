@@ -50,7 +50,8 @@ function updateCProperties() {
             "name": "Mega Drive",
             "includePath": [
                 "${workspaceFolder}/**",
-                "${env:sgdkPath}/inc/*"
+                "${env:sgdkPath}/inc/*",
+                "${env:sgdkPath}/res/*"
             ],
             "defines": [
                 "_DEBUG"
@@ -80,13 +81,15 @@ function updateCProperties() {
                     "name": "Mega Drive",
                     "includePath": [
                         "${workspaceFolder}/**",
-                        "${env:sgdkPath}/inc/*"
+                        "${env:sgdkPath}/inc/*",
+                        "${env:sgdkPath}/res/*"
                     ],
                     "defines": [
                         "_DEBUG"
                     ],
                     "compilerPath": "${env:sgdkPath}/bin/gcc.exe",
-                    "cStandard": "c11"
+                    "cStandard": "c11",
+                    "intelliSenseMode": "gcc-x64"
                 }
             ],
             "version": 4
@@ -137,15 +140,19 @@ function activate(context) {
         
         // https://github.com/politoleo/iar/blob/master/src/main.js
     })
+    let cmd_open_genplus = vscode.commands.registerCommand("sgdk.genplus", function () {
+        let genplus = new emu.EmulatorView(context)
+        genplus.createView()
+    })
     let cmd_open_picodrive = vscode.commands.registerCommand("sgdk.picodrive", function () {
-        let pico = new emu.EmulatorView(context)
+        let pico = new emu.PicoDriveEmulatorView(context)
         pico.createView()
     })
     let cmd_update_cproperties = vscode.commands.registerCommand("sgdk.updateCProperties", function() {
         updateCProperties()
     })
 
-    context.subscriptions.push(cmd_init_project, cmd_build, cmd_open_picodrive, cmd_update_cproperties)
+    context.subscriptions.push(cmd_init_project, cmd_build, cmd_open_genplus, cmd_open_picodrive, cmd_update_cproperties)
 }
 
 function deactivate() {

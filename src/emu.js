@@ -17,9 +17,9 @@ class EmulatorView {
         this.panel = null
     }
 
-    get viewType() { return "sgdk.emu.picodrive" }
-    get viewTitle() { return "PicoDrive emulator" }
-    get htmlFile() { return "PicoDrive.html" }
+    get viewType() { return "sgdk.emu.genplus" }
+    get viewTitle() { return "Genesis Plus GX emulator" }
+    get htmlFile() { return "genplus_em.html" }
     get htmlUrl() { return vscode.Uri.file(path.join(this.extensionPath, "resources", this.htmlFile)) }
     get baseUrl() { return vscode.Uri.file(path.join(this.extensionPath, "resources")) }
     
@@ -44,7 +44,7 @@ class EmulatorView {
             this.panel.onDidDispose(() => { this.dispose() }, null, this.disposables)
             this.panel.webview.html = this.makeHtml()
             this.panel.webview.onDidReceiveMessage(this.onWebviewMessage)
-            console.log("PicoDrive Webview set up")
+            console.log(this.viewTitle + " Webview set up")
         } catch (err) {
             console.error(err)
         }
@@ -80,4 +80,11 @@ class EmulatorView {
     }
 }
 
+class PicoDriveEmulatorView extends EmulatorView {
+    get viewType() { return "sgdk.emu.picodrive" }
+    get viewTitle() { return "PicoDrive emulator" }
+    get htmlFile() { return "PicoDrive.html" }
+}
+
 exports.EmulatorView = EmulatorView
+exports.PicoDriveEmulatorView = PicoDriveEmulatorView

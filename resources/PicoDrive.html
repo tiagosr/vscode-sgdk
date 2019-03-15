@@ -111,11 +111,9 @@
         },
         onRuntimeInitialized: function() {
           this.cartInsert = this.cwrap('cart_insert', 'number', ['number', 'number', 'string'])
-          this.cartInsertFromUrl = this.cwrap('cart_insert_from_url', 'void', ['string'])
           this.sendInput = this.cwrap('send_input', 'void', ['number', 'number'])
-          this.print("Runtime initialized!")
           setTimeout(function() {
-            Module.loadRom("{BASE_URL}/roms/or.bin")
+            Module.loadRom("{BASE_URL}/roms/aero.bin")
           }, 100)
           this.run()
         }
