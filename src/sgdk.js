@@ -460,6 +460,15 @@ class ProjectCompiler {
     }
 }
 
+class MakeFileLauncher {
+    /**
+     * 
+     */
+    constructor(project_config) {
+        this.project_config = project_config
+    }
+}
+
 
 exports.CCOptions = CCOptions
 exports.ASOptions = ASOptions
@@ -469,3 +478,4 @@ exports.ASLauncher = ASLauncher
 exports.LDLauncher = LDLauncher
 exports.BuildConfig = BuildConfig
 exports.ProjectCompiler = ProjectCompiler
+exports.MakeFileLauncher = MakeFileLauncher
