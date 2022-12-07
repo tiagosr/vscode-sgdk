@@ -170,7 +170,7 @@
   },
   "dependencies": {
     "dependency-graph": "^0.7.1",
-    "express": "^4.16.4",
+    "express": "^4.18.2",
     "lodash": ">=4.17.13",
     "mime": "^2.4.0",
     "node-fetch": "^2.3.0",
